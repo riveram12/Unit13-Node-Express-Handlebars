@@ -11,20 +11,21 @@ var orm = {
       cb(result);
     });
   },
-  insertOne: (table, column, value, cb) => {
+  insertOne: (value, cb) => {
+    // console.log(cb);
     // console.log("this is table: " + table);
     // console.log("this is column" + column);
     // console.log("this is value" + value);
-    var queryString = "INSERT INTO ?? (??) VALUES (?)";
-    connection.query(queryString, [table, column, value], (err, res) => {
+    var queryString = "INSERT INTO burgers (burger_name) VALUES (?)";
+    connection.query(queryString, [value], (err, res) => {
       if (err) throw err;
       // console.log(res);
       cb(res);
     });
   },
-  updateOne: (table, column, burgerId, cb) => {
-    var queryString = "UPDATE ?? SET ?? = 1 WHERE id = ?";
-    connection.query(queryString, [table, column, burgerId], (err, res) => {
+  updateOne: (burgerId, cb) => {
+    var queryString = "UPDATE burgers SET devouerd = 1 WHERE id = ?";
+    connection.query(queryString, [burgerId], (err, res) => {
       console.log("update" + queryString);
       if (err) throw err;
       console.log(res);
