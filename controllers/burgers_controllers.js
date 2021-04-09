@@ -1,30 +1,37 @@
-var express = require("express");
-var router = express.Router();
+let express = require("express");
 
-var burger = require("../models/burger");
+let router = express.Router();
 
-router.get("/", (req, res) => {
-  // console.log(req);
-  burger.selectAll((data) => {
-    var hbsObject = {
-      burger: data,
-    };
-    console.log(hbsObject);
-    res.render("index", hbsObject);
+// Import the model (burger.js) to use its database functions.
+let burger = require("../models/burger.js");
+
+// Create all our routes and set up logic within those routes where required.
+router.get("/", function (req, res) {
+  burger.all(function (data) {
+    // let hbsObject = {
+    //    burgers: data
+    //  };
+    console.log(data);
+    res.render("index", { burgers: data });
   });
 });
 
-router.post("/api/burger", (req, res) => {
-  burger.insertOne("burger_name", req.body.burger_name, (result) => {
-    res.json({ id: result.insertId });
+router.post("/api/burgers", function (req, res) {
+  burger.create(req.body.burger_name, function (result) {
+    // Send back the ID of the new burger
+    console.log(result);
+    res.redirect("/");
   });
 });
 
-router.put("/api/burger/:id", (req, res) => {
-  //creates id = id
-  var burgerId = req.params.id;
+router.put("/api/burgers/:id", function (req, res) {
+  let condition = "id = " + req.params.id;
 
-  burger.updateOne(burgerId, (result) => {
+  console.log("condition", condition);
+
+  console.log(req.body.devoured);
+
+  burger.update(req.body, condition, function (result) {
     if (result.changedRows === 0) {
       // If no rows were changed, then the ID must not exist, so 404
       return res.status(404).end();
@@ -33,5 +40,19 @@ router.put("/api/burger/:id", (req, res) => {
     }
   });
 });
+
+router.delete("/api/burgers/:id", function (req, res) {
+  let condition = "id = " + req.params.id;
+
+  burger.delete(condition, function (result) {
+    if (result.affectedRows === 0) {
+      // If no rows were changed, then the ID must not exist, so 404
+      return res.status(404).end();
+    } else {
+      res.status(200).end();
+    }
+  });
+});
+
 // Export routes for server.js to use.
 module.exports = router;
